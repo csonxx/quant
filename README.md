@@ -25,7 +25,7 @@ make test
 ├── pyproject.toml
 ├── curriculum/          # 学习路线，每个模块都有交付物和验收门槛
 ├── docs/                # 原理、研究协议、交易审判卡、资料来源
-├── labs/                # 练习入口，后续每个模块加 notebook 或脚本
+├── labs/                # 每个模块的练习入口
 ├── notebooks/           # 只放探索；正式逻辑要回写到 src/ 和 tests/
 ├── data/                # sample/raw/interim/processed 分层
 ├── src/quant_learning/  # 最小量化研究代码骨架
@@ -59,6 +59,7 @@ make test
 | 0.4 | [12 周学习计划](docs/study_plan.md) | 每周读什么、跑什么、手算什么、输出什么 |
 | 0.5 | [量化交易原理](docs/principles.md) | 想法、数据、规则、回测、反证、风控、复盘的完整链条 |
 | 0.6 | [检查清单](docs/checklists.md) | 防止被漂亮回测和复杂模型骗 |
+| 0.7 | [学习进度表](docs/progress_tracker.md) | 按阶段打勾，确认自己能手算、跑命令、解释结果 |
 
 ### 1. 课程模块和练习
 
@@ -110,6 +111,7 @@ make test
 make lesson00
 make lesson01
 make demo
+make linkcheck
 make check
 ```
 

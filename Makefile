@@ -1,7 +1,7 @@
 PYTHON ?= python3
 export PYTHONPATH := $(CURDIR)/src
 
-.PHONY: demo test compile check tree
+.PHONY: demo lesson00 lesson01 lessons test compile linkcheck check tree
 
 demo:
 	$(PYTHON) -m quant_learning.run_demo
@@ -20,7 +20,10 @@ test:
 compile:
 	$(PYTHON) -m compileall -q src tests
 
-check: compile test
+linkcheck:
+	$(PYTHON) scripts/check_markdown_links.py
+
+check: compile test linkcheck
 
 tree:
 	find . -maxdepth 3 -not -path './.git*' | sort
