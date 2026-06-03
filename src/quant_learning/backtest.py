@@ -45,12 +45,13 @@ class BacktestResult:
         return sum(point.fee_paid for point in self.equity_curve)
 
     def summary(self) -> dict[str, float]:
-        metrics = summarize_returns(
-            self.returns,
-            [point.equity for point in self.equity_curve],
-        )
+        equity_values = [point.equity for point in self.equity_curve]
+        returns = pct_returns(equity_values)
+        total_fees = sum(point.fee_paid for point in self.equity_curve)
+
+        metrics = summarize_returns(returns, equity_values)
         metrics["final_equity"] = self.final_equity
-        metrics["total_fees"] = self.total_fees
+        metrics["total_fees"] = total_fees
         metrics["trades"] = float(len(self.trades))
         return metrics
 
@@ -95,6 +96,9 @@ def run_long_only_signal_backtest(
     for previous_bar, current_bar in zip(bars, bars[1:]):
         signal = signal_by_date.get(previous_bar.date)
         target_weight = _clamp_weight(signal.target_weight if signal else 0.0)
+        # Teaching assumption: fees are charged on pre-trade equity turnover, then
+        # exposure is applied to the remaining equity. This slightly reduces the
+        # invested notional after fees and keeps the cash ledger explicit.
         fee_paid = equity * abs(target_weight - previous_weight) * fee_bps / 10_000.0
 
         if target_weight != previous_weight:

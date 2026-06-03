@@ -1,11 +1,16 @@
 from __future__ import annotations
 
 import unittest
+from datetime import date
 from pathlib import Path
 
 from quant_learning.backtest import run_long_only_signal_backtest
-from quant_learning.data import group_by_symbol, load_ohlcv_csv
-from quant_learning.strategy import moving_average_crossover_signals, simple_moving_average
+from quant_learning.data import Bar, group_by_symbol, load_ohlcv_csv
+from quant_learning.strategy import (
+    Signal,
+    moving_average_crossover_signals,
+    simple_moving_average,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,6 +33,23 @@ class StrategyBacktestTest(unittest.TestCase):
         self.assertGreater(first_invested_point.date, first_long_signal.date)
         self.assertGreater(result.final_equity, 0)
         self.assertGreaterEqual(result.total_fees, 0)
+
+    def test_fee_is_charged_before_exposure_is_applied(self) -> None:
+        bars = [
+            Bar(date(2024, 1, 1), "DEMO", 100, 100, 100, 100, 1000),
+            Bar(date(2024, 1, 2), "DEMO", 110, 110, 110, 110, 1000),
+        ]
+        signals = [Signal(date(2024, 1, 1), "DEMO", 1.0, "test_full_exposure")]
+
+        result = run_long_only_signal_backtest(
+            bars,
+            signals,
+            initial_cash=10_000,
+            fee_bps=100,
+        )
+
+        self.assertAlmostEqual(result.total_fees, 100)
+        self.assertAlmostEqual(result.final_equity, 10_890)
 
 
 if __name__ == "__main__":

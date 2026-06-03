@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from statistics import fmean, pstdev
+from statistics import fmean, stdev
 
 
 def pct_returns(values: list[float]) -> list[float]:
@@ -43,11 +43,15 @@ def annualized_return(returns: list[float], periods_per_year: int = 252) -> floa
 
 
 def annualized_volatility(returns: list[float], periods_per_year: int = 252) -> float:
-    """Population volatility annualized by sqrt(periods)."""
+    """Sample volatility annualized by sqrt(periods).
+
+    Return series in research are observed samples, not the full population, so this
+    uses N-1 in the denominator via statistics.stdev.
+    """
 
     if len(returns) < 2:
         return 0.0
-    return pstdev(returns) * math.sqrt(periods_per_year)
+    return stdev(returns) * math.sqrt(periods_per_year)
 
 
 def sharpe_ratio(
@@ -66,7 +70,7 @@ def sharpe_ratio(
 
     period_risk_free = (1.0 + risk_free_rate) ** (1.0 / periods_per_year) - 1.0
     excess = [item - period_risk_free for item in returns]
-    vol = pstdev(excess)
+    vol = stdev(excess)
     if vol == 0:
         return 0.0
     return fmean(excess) / vol * math.sqrt(periods_per_year)

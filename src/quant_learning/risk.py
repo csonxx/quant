@@ -2,7 +2,11 @@
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
+
+
+TEACHING_RISK_FRACTION_WARNING = 0.05
 
 
 @dataclass(frozen=True)
@@ -36,8 +40,15 @@ def fixed_fraction_position_size(
 
     if account_equity <= 0:
         raise ValueError("account_equity must be positive")
-    if not 0 < risk_fraction <= 0.05:
-        raise ValueError("risk_fraction should be in (0, 0.05] for this learning helper")
+    if risk_fraction <= 0:
+        raise ValueError("risk_fraction must be positive")
+    if risk_fraction > TEACHING_RISK_FRACTION_WARNING:
+        warnings.warn(
+            "risk_fraction is above the 5% teaching guardrail; this is allowed, "
+            "but review whether the position can survive a normal losing streak.",
+            UserWarning,
+            stacklevel=2,
+        )
     per_share_risk = entry_price - stop_price
     if per_share_risk <= 0:
         raise ValueError("stop_price must be below entry_price")

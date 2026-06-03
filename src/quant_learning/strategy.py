@@ -23,7 +23,13 @@ class Signal:
 
 
 def simple_moving_average(values: list[float], window: int) -> list[float | None]:
-    """Return a rolling simple moving average with None before the window is full."""
+    """Return a rolling simple moving average with None before the window is full.
+
+    This uses an incremental rolling sum for clarity and O(n) speed. For very long
+    research series, floating-point drift can accumulate; production factor code
+    should either periodically rebase the rolling sum or use a vetted numerical
+    library.
+    """
 
     if window <= 0:
         raise ValueError("window must be positive")
