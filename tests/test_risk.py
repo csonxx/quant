@@ -2,7 +2,12 @@ from __future__ import annotations
 
 import unittest
 
-from quant_learning.risk import TradePlan, fixed_fraction_position_size, review_trade_plan
+from quant_learning.risk import (
+    TradePlan,
+    fixed_fraction_position_size,
+    review_trade_plan,
+    reward_risk_ratio,
+)
 
 
 class RiskTest(unittest.TestCase):
@@ -41,6 +46,12 @@ class RiskTest(unittest.TestCase):
 
         self.assertTrue(review["passes_minimum_reward_risk"])
         self.assertEqual(review["risk_amount"], 100)
+
+    def test_reward_risk_ratio_boundaries(self) -> None:
+        with self.assertRaisesRegex(ValueError, "stop_price must be below"):
+            reward_risk_ratio(entry_price=100, stop_price=100, target_price=110)
+        with self.assertRaisesRegex(ValueError, "target_price must be above"):
+            reward_risk_ratio(entry_price=100, stop_price=95, target_price=100)
 
 
 if __name__ == "__main__":

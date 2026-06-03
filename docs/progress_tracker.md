@@ -59,7 +59,7 @@
 - [ ] 写一份 [交易审判卡](trade_review_template.md)。
 - [ ] 明确策略结论：`kill`、`observe`、`paper_trade` 或 `promote`。
 
-阶段 3 通过标准：你能把模型分数翻译成组合、成本、风控、纸面交易和下线条件。
+阶段 3 通过标准：你能用 `portfolio.py` 的最小 score-to-weight 例子说明模型分数如何进入组合，并能继续写清成本、风控、纸面交易和下线条件。
 
 ## 每次学习后的记录
 

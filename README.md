@@ -25,6 +25,7 @@ make test
 ├── pyproject.toml
 ├── curriculum/          # 学习路线，每个模块都有交付物和验收门槛
 ├── docs/                # 原理、研究协议、交易审判卡、资料来源
+├── experiments/         # 进阶实验占位，当前只保留 Qlib 学习入口
 ├── labs/                # 每个模块的练习入口
 ├── notebooks/           # 只放探索；正式逻辑要回写到 src/ 和 tests/
 ├── data/                # sample/raw/interim/processed 分层
@@ -70,8 +71,8 @@ make test
 | 02 | [数据契约和偏差](curriculum/modules/02_data_contracts.md) | [Lab 02](labs/02_data_bias_checks/README.md) | `python3 -m unittest tests.test_data` | 能指出前视、幸存者、复权和异常字段问题 |
 | 03 | [回测引擎](curriculum/modules/03_backtesting.md) | [Lab 03](labs/03_backtest_delay_costs/README.md) | `make demo` | 能解释信号延迟、费用、权益曲线怎么来的 |
 | 04 | [风险和仓位](curriculum/modules/04_risk_positioning.md) | [Lab 04](labs/04_position_sizing/README.md) | `python3 -m unittest tests.test_risk` | 能把买入信号翻译成仓位、止损、最大亏损 |
-| 05 | [因子研究](curriculum/modules/05_factor_research.md) | [Lab 05](labs/05_factor_ic/README.md) | 先手算 | 能解释横截面排序、IC、分组收益、换手 |
-| 06 | [组合构建](curriculum/modules/06_portfolio.md) | [Lab 06](labs/06_portfolio/README.md) | 先手算 | 能解释权重、相关性、集中度、再平衡 |
+| 05 | [因子研究](curriculum/modules/05_factor_research.md) | [Lab 05](labs/05_factor_ic/README.md) | `make lesson05` | 能解释横截面排序、IC、分组收益、换手 |
+| 06 | [组合构建](curriculum/modules/06_portfolio.md) | [Lab 06](labs/06_portfolio/README.md) | `make lesson06` | 能解释权重、相关性、集中度、再平衡 |
 | 07 | [机器学习](curriculum/modules/07_machine_learning.md) | [Lab 07](labs/07_machine_learning/README.md) | 先画窗口 | 能画清特征窗口、标签窗口、泄漏边界 |
 | 08 | [执行和复盘](curriculum/modules/08_execution_review.md) | [Lab 08](labs/08_execution_review/README.md) | 写审判卡 | 能写纸面交易规则、亏损分类、下线条件 |
 
@@ -101,7 +102,10 @@ make test
 | C5 | [backtest.py](src/quant_learning/backtest.py) | 03 回测 |
 | C6 | [risk.py](src/quant_learning/risk.py) | 04 风险和仓位 |
 | C7 | [factors.py](src/quant_learning/factors.py) | 05 因子 |
-| C8 | [run_demo.py](src/quant_learning/run_demo.py) | 03 完整 demo |
+| C8 | [portfolio.py](src/quant_learning/portfolio.py) | 06 分数转权重、组合收益 |
+| C9 | [run_demo.py](src/quant_learning/run_demo.py) | 03 完整 demo |
+
+代码骨架主要覆盖 00-06。07 机器学习先画清特征/标签窗口，08 执行复盘先写规则和审判卡；对应代码等你完成前面门禁后再扩展。
 
 ### 4. 测试和验证
 
@@ -110,6 +114,8 @@ make test
 ```bash
 make lesson00
 make lesson01
+make lesson05
+make lesson06
 make demo
 make linkcheck
 make check
@@ -120,6 +126,8 @@ make check
 - [test_lessons.py](tests/test_lessons.py)
 - [test_data.py](tests/test_data.py)
 - [test_metrics.py](tests/test_metrics.py)
+- [test_factors.py](tests/test_factors.py)
+- [test_portfolio.py](tests/test_portfolio.py)
 - [test_strategy_backtest.py](tests/test_strategy_backtest.py)
 - [test_risk.py](tests/test_risk.py)
 
@@ -138,6 +146,7 @@ make check
 - `src/quant_learning/backtest.py`：长仓信号回测，刻意使用上一根 K 线信号，避免同日偷看。
 - `src/quant_learning/metrics.py`：收益、波动、夏普、最大回撤。
 - `src/quant_learning/risk.py`：单笔风险、盈亏比、交易计划审查。
+- `src/quant_learning/portfolio.py`：模型/因子分数转等权 TopK 组合、组合收益。
 - `data/samples/ohlcv_demo.csv`：最小样例数据。
 
 不急着上复杂库。先把小样本手算、标准库脚本和测试跑明白。

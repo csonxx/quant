@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from statistics import stdev
+
 from quant_learning.metrics import pct_returns
 
 
@@ -24,7 +26,7 @@ def trailing_momentum(prices: list[float], lookback: int) -> list[float | None]:
 
 
 def realized_volatility(prices: list[float], lookback: int) -> list[float | None]:
-    """Return rolling standard deviation of simple returns."""
+    """Return rolling sample standard deviation of simple returns."""
 
     if lookback <= 1:
         raise ValueError("lookback must be greater than 1")
@@ -36,7 +38,5 @@ def realized_volatility(prices: list[float], lookback: int) -> list[float | None
             values.append(None)
             continue
         window = returns[index + 1 - lookback : index + 1]
-        mean = sum(window) / len(window)
-        variance = sum((item - mean) ** 2 for item in window) / len(window)
-        values.append(variance**0.5)
+        values.append(stdev(window))
     return values

@@ -88,7 +88,9 @@ def _parse_bar(row: dict[str, str], row_number: int) -> Bar:
         raise ValueError(f"row {row_number} has empty symbol")
     if min(open_price, high, low, close) <= 0:
         raise ValueError(f"row {row_number} has non-positive price")
-    if low > min(open_price, high, close) or high < max(open_price, low, close):
+    if low > high:
+        raise ValueError(f"row {row_number} has low above high")
+    if not (low <= open_price <= high and low <= close <= high):
         raise ValueError(f"row {row_number} has inconsistent OHLC range")
     if volume < 0:
         raise ValueError(f"row {row_number} has negative volume")

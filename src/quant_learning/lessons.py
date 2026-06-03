@@ -7,7 +7,9 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from quant_learning.data import group_by_symbol, load_ohlcv_csv
+from quant_learning.factors import realized_volatility, trailing_momentum
 from quant_learning.metrics import max_drawdown, pct_returns
+from quant_learning.portfolio import portfolio_return, score_to_topk_equal_weights
 
 
 @dataclass(frozen=True)
@@ -119,15 +121,55 @@ def lesson01() -> None:
     print("read this as: price movement becomes account movement only after position sizing.")
 
 
+def lesson05() -> None:
+    """Print a factor scoring lesson."""
+
+    csv_path = Path(__file__).resolve().parents[2] / "data/samples/ohlcv_demo.csv"
+    bars = group_by_symbol(load_ohlcv_csv(csv_path))["DEMO"]
+    prices = [bar.close for bar in bars[:10]]
+    momentum = trailing_momentum(prices, lookback=5)
+    volatility = realized_volatility(prices, lookback=5)
+
+    print("lesson05: factor values are scores, not trades")
+    print("")
+    print(f"prices: {[round(item, 2) for item in prices]}")
+    print(f"5_day_momentum: {_format_optional_series(momentum)}")
+    print(f"5_return_realized_volatility: {_format_optional_series(volatility)}")
+    print("")
+    print("read this as: a factor must still pass grouping, turnover, cost, and risk tests.")
+
+
+def lesson06() -> None:
+    """Print a score-to-portfolio lesson."""
+
+    scores = {"AAA": 0.9, "BBB": 0.2, "CCC": 0.9, "DDD": -0.1}
+    next_returns = {"AAA": 0.02, "BBB": -0.01, "CCC": 0.005, "DDD": 0.03}
+    weights = score_to_topk_equal_weights(scores, top_k=2)
+    one_period_return = portfolio_return(weights, next_returns)
+
+    print("lesson06: scores become weights before they become returns")
+    print("")
+    print(f"scores: {scores}")
+    print(f"top2_equal_weights: {weights}")
+    print(f"next_returns: {next_returns}")
+    print(f"portfolio_return: {one_period_return:.2%}")
+    print("")
+    print("read this as: model/factor scores are not trades until position rules define weights.")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run beginner quant lesson drills.")
-    parser.add_argument("lesson", choices=["00", "01"], help="Lesson number to run.")
+    parser.add_argument("lesson", choices=["00", "01", "05", "06"], help="Lesson number to run.")
     args = parser.parse_args(argv)
 
     if args.lesson == "00":
         lesson00()
     elif args.lesson == "01":
         lesson01()
+    elif args.lesson == "05":
+        lesson05()
+    elif args.lesson == "06":
+        lesson06()
     return 0
 
 
@@ -140,6 +182,10 @@ def _print_summary(name: str, summary: dict[str, float]) -> None:
     print(f"  cost_per_trade: {summary['cost_per_trade']:.2f}")
     print(f"  expected_value: {summary['expected_value']:.2f}")
     print(f"  total_pnl: {summary['total_pnl']:.2f}")
+
+
+def _format_optional_series(values: list[float | None]) -> list[str]:
+    return ["None" if item is None else f"{item:.4f}" for item in values]
 
 
 if __name__ == "__main__":

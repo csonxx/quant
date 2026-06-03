@@ -1,11 +1,17 @@
 from __future__ import annotations
 
 import unittest
+from contextlib import redirect_stdout
+from io import StringIO
 
 from quant_learning.lessons import (
     TradeOutcome,
     buy_and_hold_equity,
     expected_value,
+    lesson00,
+    lesson01,
+    lesson05,
+    lesson06,
     summarize_trades,
 )
 
@@ -31,6 +37,14 @@ class LessonsTest(unittest.TestCase):
 
     def test_buy_and_hold_equity(self) -> None:
         self.assertEqual(buy_and_hold_equity([100, 110, 90], 1000), [1000, 1100, 900])
+
+    def test_lessons_print(self) -> None:
+        for lesson in [lesson00, lesson01, lesson05, lesson06]:
+            with self.subTest(lesson=lesson.__name__):
+                buffer = StringIO()
+                with redirect_stdout(buffer):
+                    lesson()
+                self.assertIn("read this as:", buffer.getvalue())
 
 
 if __name__ == "__main__":

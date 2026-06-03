@@ -12,6 +12,7 @@ LINK_RE = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 
 def main() -> int:
     missing: list[str] = []
+    forbidden_absolute: list[str] = []
     for markdown_path in sorted(ROOT.rglob("*.md")):
         if ".git" in markdown_path.parts:
             continue
@@ -20,11 +21,20 @@ def main() -> int:
             clean_target = target.strip()
             if _is_external_or_anchor(clean_target):
                 continue
+            if clean_target.startswith("/"):
+                rel_markdown = markdown_path.relative_to(ROOT)
+                forbidden_absolute.append(f"{rel_markdown}: {clean_target}")
+                continue
             target_without_anchor = clean_target.split("#", 1)[0]
             resolved = (markdown_path.parent / target_without_anchor).resolve()
             if not resolved.exists():
                 rel_markdown = markdown_path.relative_to(ROOT)
                 missing.append(f"{rel_markdown}: {clean_target}")
+
+    if forbidden_absolute:
+        print("Forbidden absolute local Markdown links:")
+        print("\n".join(forbidden_absolute))
+        return 1
 
     if missing:
         print("Missing local Markdown links:")
